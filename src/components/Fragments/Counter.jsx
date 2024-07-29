@@ -6,7 +6,22 @@ class Counter extends React.Component {
     this.state = {
       count: 0
     };
+    console.log("constructor");
   }
+  // misalkan punya sebuah state, nilai defaultnya 0, saya ingin setelah dia di mounting, nilainya tidak 0 lagi
+  componentDidMount() {
+    this.setState({ count: 1 });
+    console.log("componentDidMount");
+  }
+
+  // prevprops dan prevstate digunakan untuk mengecek perubahan props dan perubahan state
+  componentDidUpdate(prevProps, prevState) {
+    console.log("componentDidUpdate");
+    if(this.state.count === 10) {
+      this.setState({ count: 0 });
+    }
+  }
+
   render() {
     return (
       <div className="flex items-center">
@@ -15,6 +30,7 @@ class Counter extends React.Component {
         p-3" onClick={() => this.setState({ count: this.state.count + 1 })}>
           +
         </button>
+        {console.log('render')}
       </div>
     );
   }
