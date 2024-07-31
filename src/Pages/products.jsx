@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useState } from "react";
+import { Fragment, useEffect, useRef, useState } from "react";
 import CardProduct from "../components/Fragments/CardProduct";
 import Button from "../components/Elements/Button";
 import Counter from "../components/Fragments/Counter";
@@ -37,14 +37,14 @@ const ProductsPage = () => {
   }, []);
 
   useEffect(() => {
-      if (cart.length > 0) {
-        const sum = cart.reduce((acc, item) => {
-          const product = products.find((product) => product.id === item.id);
-          return acc + product.price * item.qty;
-        },0)
-        setTotalPrice(sum);
-        localStorage.setItem("cart", JSON.stringify(cart));
-      }
+    if (cart.length > 0) {
+      const sum = cart.reduce((acc, item) => {
+        const product = products.find((product) => product.id === item.id);
+        return acc + product.price * item.qty;
+      }, 0);
+      setTotalPrice(sum);
+      localStorage.setItem("cart", JSON.stringify(cart));
+    }
   }, [cart]);
 
   const handleLogout = () => {
@@ -67,6 +67,23 @@ const ProductsPage = () => {
     }
   };
 
+  // useRef
+  const cartRef = useRef(JSON.parse(localStorage.getItem("cart")) || []);
+
+  const handleAddToCartRef = (id) => {
+    cartRef.current = [...cartRef.current, { id: id, qty: 1 }];
+    localStorage.setItem("cart", JSON.stringify(cartRef.current));
+  };
+
+  const totalPriceRef = useRef(null);
+  useEffect(() => {
+    if (cart.length > 0) {
+      totalPriceRef.current.style.display = "table-row";
+    } else {
+      totalPriceRef.current.style.display = "none";
+    }
+  }, [cart]);
+
   return (
     <Fragment>
       <div className="flex justify-end h-20 bg-blue-600 text-white items-center px-10">
@@ -85,8 +102,8 @@ const ProductsPage = () => {
               </CardProduct.Body>
               <CardProduct.Footer
                 price={product.price}
-                handleAddToCart={handleAddToCart}
                 id={product.id}
+                handleAddToCart={handleAddToCart}
               />
             </CardProduct>
           ))}
@@ -128,7 +145,7 @@ const ProductsPage = () => {
                   </tr>
                 );
               })}
-              <tr>
+              <tr ref={totalPriceRef}>
                 <td colSpan={3}>
                   <b>Total Price</b>
                 </td>
